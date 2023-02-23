@@ -12,7 +12,7 @@ interface ProductDao {
   fun saveProduct(product: Product): Long
 
   @Delete
-  fun deleteProduct(productId: Long): Int
+  fun deleteProduct(product: Product): Int
 
   @Query("SELECT * FROM tbl_product ORDER BY tbl_product.name ASC")
   fun getAllProduct(): List<Product>

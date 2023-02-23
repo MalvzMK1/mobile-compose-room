@@ -1,6 +1,7 @@
 package br.senai.sp.jandira.lazycolumnroom
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -11,14 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,14 +50,66 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun LazyColumnCompose() {
+  var nameState by remember {
+    mutableStateOf("")
+  }
+
+  var priceState by remember {
+    mutableStateOf("")
+  }
+
+  var descriptionState by remember {
+    mutableStateOf("")
+  }
+
+  var productsState by remember {
+    mutableStateOf(listOf<Product>())
+  }
+
+  val context = LocalContext.current
+  val productRepository = ProductRepository(context)
+
   Column(
-    modifier = Modifier.fillMaxSize()
+    modifier = Modifier.fillMaxSize().padding(16.dp)
   ) {
-    Text("Lazy Column")
+    Text("Listas com JetPack Compose")
+    OutlinedTextField(
+      value = nameState,
+      onValueChange = {
+        nameState = it
+      },
+      modifier = Modifier.fillMaxWidth()
+    )
+    OutlinedTextField(
+      value = priceState,
+      onValueChange = {
+        priceState = it
+      },
+      modifier = Modifier.fillMaxWidth()
+    )
+    OutlinedTextField(
+      value = descriptionState,
+      onValueChange = {
+        descriptionState = it
+      },
+      modifier = Modifier.fillMaxWidth()
+    )
+    Button(onClick = {
+      val p = Product(
+        name = nameState,
+        price = priceState.toDouble(),
+        description = descriptionState
+      )
+      val newId = productRepository.save(p)
+      productsState = productRepository.getProductsList()
+      Toast.makeText(context, "$newId", Toast.LENGTH_SHORT).show()
+    }, modifier = Modifier.fillMaxWidth()) {
+      Text("Salvar")
+    }
     LazyColumn(
       modifier = Modifier.padding(16.dp)
     ) {
-      items(ProductRepository.getAllProducts()) {
+      items(productsState) {
         ProductCard(product = it)
       }
     }
